@@ -6,7 +6,7 @@ import pymongo
 #Discord setup
 prefix = '$'
 intents = discord.Intents.all()
-token = "MTAzMTgyMjkwMjk1OTU1MDUzNA.GnzPlN.YSaQAKW8M2asD0Byk8i2QA0u53rhcavMx6OOJI"
+token = ""
 client = discord.Client(intents=intents)
 
 #MongoDB setup
