@@ -1,0 +1,1 @@
+message_reward_weight = 1

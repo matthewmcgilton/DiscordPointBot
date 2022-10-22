@@ -1,32 +1,36 @@
 import discord
 import commands
 import games
+import pymongo
 
-#Initial setup
+#Discord setup
 prefix = '$'
 intents = discord.Intents.all()
-
-token = ""
+token = "MTAzMTgyMjkwMjk1OTU1MDUzNA.GnzPlN.YSaQAKW8M2asD0Byk8i2QA0u53rhcavMx6OOJI"
 client = discord.Client(intents=intents)
 
+#MongoDB setup
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+database = myclient["DiscordBot"]
+
 #Events
-@client.event #decorator function
+@client.event
 async def on_ready():
     print(f"Bot logged in as {client.user}")
     
 @client.event
 async def on_message(msg):
-    #Check to ignore bot messages
     if msg.author != client.user:
-        #Commands/games
         if msg.content.lower().startswith("$coinflip"):
-            await games.coinflip(msg, client)
+            await games.coinflip(msg, database)
         elif msg.content.lower().startswith("$top"):
-            await commands.top_users(msg, client)
+            await commands.top_users(msg, database)
         elif msg.content.lower().startswith("$balance"):
-            await commands.balance(msg)
+            await commands.balance(msg, database)
+        elif msg.content.lower().startswith("$help"):
+            await commands.help(msg)
         else:
-            await commands.add_points(msg)
+            await commands.add_points(msg, database)
 
 #Start
 client.run(token)
