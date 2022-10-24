@@ -17,6 +17,7 @@ I learned a lot while building this bot. Not just with discord.py, pymongo, or h
 - MongoDB support
 - Heroku support
 - Basic commands and account logging
+- Basic fully functional coinflip game (Accounts for all edge cases.. I hope)
 
 ### Todo:
 - Games
