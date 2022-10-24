@@ -1,12 +1,17 @@
 import json
 import os
 import pymongo
+import discord
 from settings import message_reward_weight
 
 #Help command which shows all commands
 async def help(msg):
-    await msg.channel.send(f"Commands:\n- $help\n- $balance\n- $top")
-    await msg.channel.send(f"Games:\n- $coinflip")
+    embed = discord.Embed(title="Point Bot's Commands", color=0x81c38a)
+    embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/1031822902959550534/7a3a4c9ace0dcd545f79a0a3892526ee.webp?size=80")
+    embed.add_field(name="$help", value="Shows a list of all the bot's commands", inline=False)
+    embed.add_field(name="$balance OR $bal", value="Shows your current point balance", inline=False)
+    embed.add_field(name="$top", value="Shows the top 3 ranked uers on the server", inline=False)
+    await msg.channel.send(embed=embed)
 
 #Command which allows users to check their balance
 async def balance(msg, database):
@@ -17,22 +22,36 @@ async def balance(msg, database):
 
     #If the user wasn't found create one and return 0 points, otherwise return points of existing user
     if len(search) == 0:
-        await msg.channel.send(f"{msg.author.name}, you have 0 points")
         collection.insert_one({"_id": msg.author.id, "name": msg.author.name, "points": 0})
-    else:
-        await msg.channel.send(f"{search[0]['name']}, you have {search[0]['points']} points")
+    
+    #Create embed
+    embed = discord.Embed(title=f"{msg.author.name}'s Balance", description=f"{search[0]['points']} points", color=0x81c38a)
+    embed.set_thumbnail(url=msg.guild.get_member(search[0]["_id"]).avatar)
+
+    await msg.channel.send(embed=embed)
 
 #Command which displays the top 3 users of the server.
 async def top_users(msg, database):
     #From collection, sort by points
     collection = database[str(msg.guild.id)]
     search = list(collection.find().sort("points", -1))
+
+    #Create the embed
+    embed = discord.Embed(title=f"{msg.guild.name}'s Leaderboard", color=0x81c38a)
     
-    #TODO make this an embed rather than just printing 3 messages
+    #Add a field for the top 3 users from the MongoDB search
     i = 1
     for user in search:
-        await msg.channel.send(f"{i}. {user['name']} has {user['points']} points")
+        embed.add_field(name=f"{i}. {user['name']}", value=f"{user['points']} points", inline=False)
+        #Rank one user
+        if i == 1:
+            embed.set_thumbnail(url=msg.guild.get_member(user["_id"]).avatar)
+        if i == 3:
+            break
         i += 1
+
+    #Send the embed
+    await msg.channel.send(embed=embed)
 
 #Command which adds points to a user's balance
 async def add_points(msg, database):
