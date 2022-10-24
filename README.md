@@ -20,5 +20,7 @@ I learned a lot while building this bot. Not just with discord.py, pymongo, or h
 - Basic fully functional coinflip game (Accounts for all edge cases.. I hope)
 
 ### Todo:
-- Games
-- Additional commands (transacting/trading)
+- Range game (Allow users to guess from a number in a range they set. Reward based on % odds)
+- Roulette game
+- Have leaderboard show total points in server circulation along with the user's % of total
+- Random jackpots (0.1% chance for a message to win the pot)
