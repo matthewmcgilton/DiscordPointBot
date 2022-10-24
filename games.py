@@ -1,55 +1,67 @@
-import os
-import json
 import random
+import discord
 
 #Coinflip game which doubles the users bet if they guess correctly
-async def coinflip(msg, client):
-    #Splits it in to a list of components E.g. ["$coinflip", "heads/tails", "value"]
-    message = msg.content.split(" ")
-    author = str(msg.author.id)
+async def coinflip(msg, database):
+    #Start creating the message
+    embed = discord.Embed(title="Coinflip Result", color=0x81c38a)
+    embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/1031822902959550534/7a3a4c9ace0dcd545f79a0a3892526ee.webp?size=80")
 
-    #Checks to make sure only necessary components in the command
-    if(len(message) != 3):
-        await msg.channel.send("""Please ensure that you formatted the command properly
-                                  \n$coinflip heads/tails amount""")
-        return False
-    
-    #Checks to make sure only heads or tails picked
-    if(message[1] != "heads" and message[1] != "tails"):
-        await msg.channel.send("Make sure you entered heads or tails as your choice")
+    #Check to see if command is properly formatted e.g. $flip 500 up/down
+    command = msg.content.lower().split(" ")
+    if len(command) != 3:
+        embed.add_field(name="Error", value="Command must be formatted $flip <amount> <up/down>", inline=False)
+        await msg.channel.send(embed=embed)
         return False
 
-    #Checks to make sure bet is a number and is larger than 0
+    #Check to see if bet is an int
     try:
-        if(int(message[2]) <= 0):
-            await msg.channel.send("Make sure you bet more than 0 points")
+        int(command[1])
+    except:
+        embed.add_field(name="Error", value="Please enter a valid number to bet", inline=False)
+        await msg.channel.send(embed=embed)
+        return False
+
+    #Check to see if bet is larger than 0
+    if int(command[1]) <= 0:
+            embed.add_field(name="Error", value="Please bet a value above 0", inline=False)
+            await msg.channel.send(embed=embed)
             return False
-    except ValueError:
-        await msg.channel.send("Make sure you entered a number to bet")
-        return False
-
-    #Opens the file for the server
-    path = f"{os.path.dirname(__file__)}/Servers/{msg.guild.id}.txt"
-    with open(path) as file:
-        data = json.loads(file.read())
     
-    if author not in data:
-        await msg.channel.send("Your bet exceeded your current balance")
-        print("POG")
-        return False
-
-    if data[author] < int(message[2]):
-        await msg.channel.send("Your bet exceeded your current balance")
-        print("POasdG")
+    #Check to see if bet type is up or down
+    if command[2] != "up" and command[2] != "down":
+        embed.add_field(name="Error", value="Please either bet up or down", inline=False)
+        await msg.channel.send(embed=embed)
         return False
     
-    choice = "heads" if random.randint(0, 1) == 0 else "tails"
-    if message[1] == choice:
-        data[author] += int(message[2])
-        await msg.channel.send(f"The coin landed on {choice}! You won {int(message[2])*2}")
+    amount = int(command[1])
+    bet = command[2]
+
+    #Search for user in the server's collection
+    collection = database[str(msg.guild.id)]
+    query = {"_id": msg.author.id}
+    search = list(collection.find(query))
+
+    #If user not found, make one and tell them they don't have enough to bet
+    if len(search) == 0:
+        collection.insert_one({"_id": msg.author.id, "name": msg.author.name, "points": 0})
+        embed.add_field(name="Error", value="You don't have enough to bet", inline=False)
+        await msg.channel.send(embed=embed)
+        return False
+    
+    #Otherwise check the existing user's points vs the amount they want to bet
+    if search[0]['points'] < amount:
+        embed.add_field(name="Error", value="You don't have enough to bet", inline=False)
+        await msg.channel.send(embed=embed)
+        return False
+    
+    #All checks passed, complete the flip, 0 for down, 1 for up
+    result = "down" if random.randint(0, 1) == 0 else "up"
+    if bet == result:
+        embed.add_field(name="Congrats!", value=f"The coin landed {result} and you won {amount} points!", inline=False)
+        collection.update_one(query, {"$set": {"points": search[0]['points']+amount}})
     else:
-        data[author] -= int(message[2])
-        await msg.channel.send(f"The coin landed on {choice}! You lost {int(message[2])}")
-    
-    with open(path, 'w') as file:
-        json.dump(data, file)
+        embed.add_field(name="Sorry!", value=f"The coin landed {result} and you lost {amount} points.", inline=False)
+        collection.update_one(query, {"$set": {"points": search[0]['points']-amount}})
+
+    await msg.channel.send(embed=embed)

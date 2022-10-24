@@ -6,11 +6,11 @@ import pymongo
 #Discord setup
 prefix = '$'
 intents = discord.Intents.all()
-token = "ENTER TOKEN HERE"
+token = "YOUR TOKEN HERE"
 client = discord.Client(intents=intents)
 
 #MongoDB setup
-myclient = pymongo.MongoClient("ENTER DATABASE ADDRESS HERE")
+myclient = pymongo.MongoClient("YOUR DATABASE ADDRESS HERE")
 database = myclient["DiscordBot"]
 
 #Events
@@ -27,6 +27,8 @@ async def on_message(msg):
             await commands.balance(msg, database)
         elif msg.content.lower().startswith("$help"):
             await commands.help(msg)
+        elif msg.content.lower().startswith("$flip"):
+            await games.coinflip(msg, database)
         else:
             await commands.add_points(msg, database)
 

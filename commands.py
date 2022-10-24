@@ -1,6 +1,3 @@
-import json
-import os
-import pymongo
 import discord
 from settings import message_reward_weight
 
@@ -11,6 +8,7 @@ async def help(msg):
     embed.add_field(name="$help", value="Shows a list of all the bot's commands", inline=False)
     embed.add_field(name="$balance OR $bal", value="Shows your current point balance", inline=False)
     embed.add_field(name="$top", value="Shows the top 3 ranked uers on the server", inline=False)
+    embed.add_field(name="$flip <amount> <up/down>", value="Allows you to bet on the outcome of a coin to double your bet", inline=False)
     await msg.channel.send(embed=embed)
 
 #Command which allows users to check their balance
