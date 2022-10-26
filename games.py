@@ -57,11 +57,15 @@ async def coinflip(msg, database):
     
     #All checks passed, complete the flip, 0 for down, 1 for up
     result = "down" if random.randint(0, 1) == 0 else "up"
+    new_balance = 0
     if bet == result:
+        new_balance = search[0]['points']+amount
         embed.add_field(name="Congrats!", value=f"The coin landed {result} and you won {amount} points!", inline=False)
-        collection.update_one(query, {"$set": {"points": search[0]['points']+amount}})
+        collection.update_one(query, {"$set": {"points": new_balance}})
     else:
-        embed.add_field(name="Sorry!", value=f"The coin landed {result} and you lost {amount} points.", inline=False)
-        collection.update_one(query, {"$set": {"points": search[0]['points']-amount}})
+        new_balance = search[0]['points']-amount
+        embed.add_field(name="Sorry!", value=f"The coin landed {result} and you lost {amount} points", inline=False)
+        collection.update_one(query, {"$set": {"points": new_balance}})
 
+    embed.set_footer(text=f"Your balance is now {new_balance} points")
     await msg.channel.send(embed=embed)

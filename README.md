@@ -18,9 +18,10 @@ I learned a lot while building this bot. Not just with discord.py, pymongo, or h
 - Heroku support
 - Basic commands and account logging
 - Basic fully functional coinflip game (Accounts for all edge cases.. I hope)
+- Random jackpots (1% chance for a message to win the pot aka every 1 in 100 messages will gain bonus points)
+- Leaderboard shows total points in server circulation
 
 ### Todo:
-- Range game (Allow users to guess from a number in a range they set. Reward based on % odds)
+- Range game
 - Roulette game
-- Have leaderboard show total points in server circulation along with the user's % of total
-- Random jackpots (0.1% chance for a message to win the pot)
+- Have leaderboard show the user's % of total server points
