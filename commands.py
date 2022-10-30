@@ -1,6 +1,6 @@
 import discord
 import random
-from settings import message_reward_weight, jackpot_amount, jackpot_odds
+from settings import Settings
 
 #Help command which shows all commands
 async def help(msg):
@@ -138,11 +138,11 @@ async def add_points(msg, database):
     amount = 0
 
     #Roll for user to win the jackpot
-    if random.randint(1, 1000) <= jackpot_odds:
-        amount = jackpot_amount
-        await msg.channel.send(f"Congrats! You won the {(jackpot_odds/1000)*100}% jackpot worth {jackpot_amount} points!")
+    if random.randint(1, 1000) <= Settings().JACKPOT_ODDS:
+        amount = Settings().JACKPOT_AMOUNT
+        await msg.channel.send(f"Congrats! You won the {(Settings().JACKPOT_ODDS/1000)*100}% jackpot worth {Settings().JACKPOT_AMOUNT} points!")
     else:
-        amount = len(msg.content) * message_reward_weight
+        amount = len(msg.content) * Settings().MESSAGE_REWARD_WEIGHT
 
     #If the user wasn't found create one, otherwise add points to existing user
     if len(search) == 0:

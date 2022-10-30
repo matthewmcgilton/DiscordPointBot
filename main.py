@@ -2,16 +2,16 @@ import discord
 import commands
 import games
 import pymongo
-from settings import bot_token, mongo_address
+from settings import Settings
 
 #Discord setup
 prefix = '$'
 intents = discord.Intents.all()
-token = bot_token
+token = Settings().BOT_TOKEN
 client = discord.Client(intents=intents)
 
 #MongoDB setup
-myclient = pymongo.MongoClient(mongo_address)
+myclient = pymongo.MongoClient(Settings().MONGO_ADDRESS)
 database = myclient["DiscordBot"]
 
 #Events
