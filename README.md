@@ -1,7 +1,7 @@
 # DiscordPointBot by Matthew McGilton
 
 ## Preview
-![image](https://imgur.com/T2EHZRp)
+![image](https://i.imgur.com/T2EHZRp.png)
 
 ## Summary
 This is a discord bot which rewards users with points based on how active they are in the server's chat. The users are able to then use their points on games, send points to others, and check their rank on the server!
